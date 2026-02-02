@@ -1,0 +1,105 @@
+{
+  "sources": {
+    "airframes": {
+      "enabled": false,
+      "name": "Airframes.io",
+      "type": "acars",
+      "description": "ACARS, CPDLC, ADSC messages",
+      "requires_api_key": true,
+      "status": "waiting_for_api_access",
+      "data_types": [
+        "acars",
+        "cpdlc",
+        "adsc",
+        "oooi",
+        "weather"
+      ]
+    },
+    "opensky": {
+      "enabled": true,
+      "name": "OpenSky Network",
+      "type": "adsb",
+      "description": "Live ADS-B aircraft positions",
+      "requires_api_key": false,
+      "status": "active",
+      "data_types": [
+        "position",
+        "altitude",
+        "velocity"
+      ],
+      "update_interval": 10000
+    },
+    "local_adsb": {
+      "enabled": false,
+      "name": "Local ADS-B Receiver",
+      "type": "adsb",
+      "description": "Direct connection to local receiver",
+      "requires_api_key": false,
+      "status": "not_configured",
+      "data_types": [
+        "position",
+        "raw_adsb"
+      ],
+      "config": {
+        "host": "localhost",
+        "port": 30003,
+        "protocol": "beast"
+      }
+    },
+    "adsbexchange": {
+      "enabled": true,
+      "name": "ADS-B Exchange",
+      "type": "adsb",
+      "description": "Global unfiltered ADS-B data (obtain API key from https://www.adsbexchange.com/data/)",
+      "requires_api_key": true,
+      "status": "ready",
+      "data_types": [
+        "position",
+        "track",
+        "history"
+      ],
+      "config": {
+        "api_key": "",
+        "base_url": "https://adsbexchange.com/api/aircraft",
+        "default_location": {
+          "lat": 38.9072,
+          "lon": -77.0369,
+          "dist": 50
+        },
+        "poll_interval": 10000,
+        "max_distance": 100
+      }
+    },
+    "flightaware": {
+      "enabled": false,
+      "name": "FlightAware",
+      "type": "flight_data",
+      "description": "Flight status and schedules",
+      "requires_api_key": true,
+      "status": "disabled",
+      "data_types": [
+        "flight_status",
+        "schedules",
+        "routes"
+      ]
+    },
+    "eam_watch": {
+      "enabled": true,
+      "name": "EAM.watch",
+      "type": "eam",
+      "description": "Emergency Action Messages from EAM.watch API",
+      "requires_api_key": true,
+      "status": "active",
+      "data_types": [
+        "eam",
+        "skyking",
+        "hfgcs"
+      ],
+      "config": {
+        "api_token": "",
+        "base_url": "https://api.eam.watch",
+        "poll_interval": 60000
+      }
+    }
+  }
+}

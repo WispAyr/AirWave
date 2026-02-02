@@ -1,0 +1,918 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import 'leaflet/dist/leaflet.css';
+
+:root {
+  --font-inter: 'Inter', sans-serif;
+  --font-jetbrains-mono: 'JetBrains Mono', monospace;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2d2d2d;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3d3d3d;
+}
+
+/* SpaceX-style grid background */
+.grid-background {
+  background-image: 
+    linear-gradient(rgba(0, 216, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 216, 255, 0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+  background-position: 0 0, 0 0;
+  animation: grid-scroll 20s linear infinite;
+}
+
+@keyframes grid-scroll {
+  0% {
+    background-position: 0 0, 0 0;
+  }
+  100% {
+    background-position: 50px 50px, 50px 50px;
+  }
+}
+
+/* Glitch effect for headers */
+.glitch {
+  position: relative;
+  animation: glitch 3s infinite;
+}
+
+@keyframes glitch {
+  0%, 90%, 100% {
+    transform: translate(0);
+  }
+  92% {
+    transform: translate(-2px, 0);
+  }
+  94% {
+    transform: translate(2px, 0);
+  }
+  96% {
+    transform: translate(-2px, 0);
+  }
+}
+
+/* Pulse animation for live indicators */
+.pulse-live {
+  animation: pulse-live 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse-live {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Broadcast scene transitions */
+.broadcast-scene-enter {
+  opacity: 0;
+  transform: scale(0.95);
+}
+
+.broadcast-scene-enter-active {
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 500ms ease-in-out, transform 500ms ease-in-out;
+}
+
+.broadcast-scene-exit {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.broadcast-scene-exit-active {
+  opacity: 0;
+  transform: scale(0.95);
+  transition: opacity 500ms ease-in-out, transform 500ms ease-in-out;
+}
+
+/* Scan line effect */
+.scan-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(to bottom, transparent, rgba(0, 216, 255, 0.5), transparent);
+  animation: scan 3s linear infinite;
+  pointer-events: none;
+}
+
+/* Terminal-style text */
+.terminal-text {
+  font-family: var(--font-jetbrains-mono);
+  text-shadow: 0 0 5px rgba(0, 255, 65, 0.3);
+}
+
+/* Data card glow */
+.data-card {
+  background: rgba(45, 45, 45, 0.3);
+  border: 1px solid rgba(0, 216, 255, 0.2);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.data-card:hover {
+  border-color: rgba(0, 216, 255, 0.5);
+  box-shadow: 0 0 20px rgba(0, 216, 255, 0.1);
+}
+
+/* Leaflet dark theme customization */
+.leaflet-container {
+  font-family: var(--font-jetbrains-mono);
+  background: #000000 !important;
+}
+
+.leaflet-popup-content-wrapper {
+  background: #0a0a0a !important;
+  color: #ffffff !important;
+  border: 1px solid #00d8ff !important;
+  border-radius: 4px !important;
+  box-shadow: 0 0 20px rgba(0, 216, 255, 0.3) !important;
+}
+
+.leaflet-popup-tip {
+  background: #0a0a0a !important;
+  border: 1px solid #00d8ff !important;
+}
+
+.leaflet-control-zoom a {
+  background: #2d2d2d !important;
+  color: #00d8ff !important;
+  border: 1px solid #00d8ff !important;
+}
+
+.leaflet-control-zoom a:hover {
+  background: #3d3d3d !important;
+}
+
+.leaflet-control-attribution {
+  background: rgba(0, 0, 0, 0.8) !important;
+  color: #888 !important;
+  font-size: 9px !important;
+}
+
+.leaflet-control-attribution a {
+  color: #00d8ff !important;
+}
+
+/* Aircraft Marker Styles */
+.aircraft-marker {
+  background: transparent !important;
+  border: none !important;
+}
+
+.aircraft-marker-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: var(--font-jetbrains-mono);
+  font-size: 10px;
+  text-shadow: 0 0 4px rgba(0, 0, 0, 0.8);
+}
+
+.aircraft-icon {
+  font-size: 20px;
+  filter: drop-shadow(0 0 3px rgba(0, 216, 255, 0.6));
+}
+
+.aircraft-callsign {
+  color: #00d8ff;
+  font-weight: bold;
+  white-space: nowrap;
+  margin-top: 2px;
+}
+
+.aircraft-alt,
+.aircraft-speed {
+  color: #aaa;
+  font-size: 8px;
+}
+
+/* Source-specific marker colors */
+.aircraft-marker-tar1090 .aircraft-icon {
+  filter: drop-shadow(0 0 5px rgba(0, 216, 255, 0.8));
+  color: #00d8ff;
+}
+
+.aircraft-marker-tar1090 .aircraft-callsign {
+  color: #00d8ff;
+}
+
+.aircraft-marker-opensky .aircraft-icon {
+  filter: drop-shadow(0 0 5px rgba(0, 255, 100, 0.8));
+  color: #00ff64;
+}
+
+.aircraft-marker-opensky .aircraft-callsign {
+  color: #00ff64;
+}
+
+.aircraft-marker-adsbexchange .aircraft-icon {
+  filter: drop-shadow(0 0 5px rgba(100, 150, 255, 0.8));
+  color: #6496ff;
+}
+
+.aircraft-marker-adsbexchange .aircraft-callsign {
+  color: #6496ff;
+}
+
+/* Military aircraft markers */
+.aircraft-marker-military .aircraft-icon {
+  filter: drop-shadow(0 0 8px rgba(255, 50, 50, 1)) drop-shadow(0 0 15px rgba(255, 50, 50, 0.5));
+  color: #ff3232;
+  animation: military-pulse 2s ease-in-out infinite;
+}
+
+.aircraft-marker-military .aircraft-callsign {
+  color: #ff3232;
+  font-weight: bold;
+}
+
+@keyframes military-pulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 8px rgba(255, 50, 50, 1)) drop-shadow(0 0 15px rgba(255, 50, 50, 0.5));
+  }
+  50% {
+    filter: drop-shadow(0 0 12px rgba(255, 50, 50, 1)) drop-shadow(0 0 20px rgba(255, 50, 50, 0.8));
+  }
+}
+
+/* TACAMO (E-6B) special highlighting */
+.aircraft-marker-tacamo .aircraft-icon {
+  filter: drop-shadow(0 0 10px rgba(255, 140, 0, 1)) drop-shadow(0 0 20px rgba(255, 140, 0, 0.6));
+  color: #ff8c00;
+  animation: tacamo-pulse 1.5s ease-in-out infinite;
+}
+
+.aircraft-marker-tacamo .aircraft-callsign {
+  color: #ff8c00;
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+@keyframes tacamo-pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+/* Nightwatch (E-4B) special highlighting */
+.aircraft-marker-nightwatch .aircraft-icon {
+  filter: drop-shadow(0 0 10px rgba(160, 32, 240, 1)) drop-shadow(0 0 20px rgba(160, 32, 240, 0.6));
+  color: #a020f0;
+  animation: nightwatch-pulse 1.5s ease-in-out infinite;
+}
+
+.aircraft-marker-nightwatch .aircraft-callsign {
+  color: #a020f0;
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+@keyframes nightwatch-pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+/* Source and military indicator badges */
+.source-badge {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 9px;
+  font-weight: bold;
+  font-family: var(--font-jetbrains-mono);
+  text-transform: uppercase;
+  margin-left: 4px;
+}
+
+.source-badge-tar1090 {
+  background: rgba(0, 216, 255, 0.2);
+  border: 1px solid #00d8ff;
+  color: #00d8ff;
+}
+
+.source-badge-opensky {
+  background: rgba(0, 255, 100, 0.2);
+  border: 1px solid #00ff64;
+  color: #00ff64;
+}
+
+.source-badge-adsbexchange {
+  background: rgba(100, 150, 255, 0.2);
+  border: 1px solid #6496ff;
+  color: #6496ff;
+}
+
+.military-indicator {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 9px;
+  font-weight: bold;
+  font-family: var(--font-jetbrains-mono);
+  background: rgba(255, 50, 50, 0.2);
+  border: 1px solid #ff3232;
+  color: #ff3232;
+  margin-left: 4px;
+  animation: military-badge-pulse 2s ease-in-out infinite;
+}
+
+@keyframes military-badge-pulse {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(255, 50, 50, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 10px rgba(255, 50, 50, 0.8);
+  }
+}
+
+.tacamo-indicator {
+  background: rgba(255, 140, 0, 0.2);
+  border: 1px solid #ff8c00;
+  color: #ff8c00;
+}
+
+.nightwatch-indicator {
+  background: rgba(160, 32, 240, 0.2);
+  border: 1px solid #a020f0;
+  color: #a020f0;
+}
+
+/* Radio Waves Animations */
+
+/* Top emanating waves */
+.radio-wave {
+  position: absolute;
+  width: 800px;
+  height: 400px;
+  border: 2px solid #00d8ff;
+  border-radius: 50%;
+  border-top: transparent;
+  border-left: transparent;
+  border-right: transparent;
+  transform: rotate(180deg);
+  animation: radioWave 4s ease-out infinite;
+}
+
+.radio-wave-1 { animation-delay: 0s; }
+.radio-wave-2 { animation-delay: 0.8s; }
+.radio-wave-3 { animation-delay: 1.6s; }
+.radio-wave-4 { animation-delay: 2.4s; }
+.radio-wave-5 { animation-delay: 3.2s; }
+
+@keyframes radioWave {
+  0% {
+    transform: rotate(180deg) scale(0.3);
+    opacity: 1;
+    border-color: #00ff41;
+  }
+  50% {
+    border-color: #00d8ff;
+  }
+  100% {
+    transform: rotate(180deg) scale(1.5);
+    opacity: 0;
+    border-color: #0075c9;
+  }
+}
+
+/* Bottom emanating waves */
+.radio-wave-bottom {
+  position: absolute;
+  width: 600px;
+  height: 300px;
+  border: 2px solid #0075c9;
+  border-radius: 50%;
+  border-bottom: transparent;
+  border-left: transparent;
+  border-right: transparent;
+  animation: radioWaveBottom 5s ease-out infinite;
+}
+
+.radio-wave-bottom-1 { animation-delay: 0s; }
+.radio-wave-bottom-2 { animation-delay: 1.5s; }
+.radio-wave-bottom-3 { animation-delay: 3s; }
+
+@keyframes radioWaveBottom {
+  0% {
+    transform: scale(0.3);
+    opacity: 1;
+    border-color: #00d8ff;
+  }
+  100% {
+    transform: scale(1.8);
+    opacity: 0;
+    border-color: #0075c9;
+  }
+}
+
+/* Circular waves from sides */
+.radio-circle {
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  border: 1px solid #00d8ff;
+  border-radius: 50%;
+  border-right: transparent;
+  animation: radioCircle 6s linear infinite;
+}
+
+.radio-circle-1 { animation-delay: 0s; }
+.radio-circle-2 { animation-delay: 1.5s; }
+.radio-circle-3 { animation-delay: 3s; }
+.radio-circle-4 { animation-delay: 4.5s; }
+
+@keyframes radioCircle {
+  0% {
+    transform: scale(0.2);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+.radio-circle-right {
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  border: 1px solid #0075c9;
+  border-radius: 50%;
+  border-left: transparent;
+  animation: radioCircleRight 5s linear infinite;
+}
+
+.radio-circle-right-1 { animation-delay: 0s; }
+.radio-circle-right-2 { animation-delay: 1.8s; }
+.radio-circle-right-3 { animation-delay: 3.6s; }
+
+@keyframes radioCircleRight {
+  0% {
+    transform: scale(0.3);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
+
+/* Signal wave paths */
+.signal-wave {
+  opacity: 0.5;
+  animation: signalFlow 8s ease-in-out infinite;
+}
+
+.signal-wave-1 { animation-delay: 0s; }
+.signal-wave-2 { animation-delay: 2s; }
+.signal-wave-3 { animation-delay: 4s; }
+.signal-wave-4 { animation-delay: 6s; }
+
+@keyframes signalFlow {
+  0%, 100% {
+    opacity: 0.2;
+    stroke-dasharray: 10 20;
+    stroke-dashoffset: 0;
+  }
+  50% {
+    opacity: 0.6;
+    stroke-dasharray: 10 20;
+    stroke-dashoffset: 30;
+  }
+}
+
+/* Transmission tower signals */
+.tower-signal {
+  animation: towerPulse 2s ease-out infinite;
+}
+
+.tower-signal-1 { animation-delay: 0s; }
+.tower-signal-2 { animation-delay: 0.3s; }
+.tower-signal-3 { animation-delay: 0.6s; }
+
+@keyframes towerPulse {
+  0% {
+    r: 5;
+    opacity: 1;
+  }
+  100% {
+    r: 30;
+    opacity: 0;
+  }
+}
+
+.transmission-tower {
+  animation: towerGlow 3s ease-in-out infinite;
+}
+
+@keyframes towerGlow {
+  0%, 100% {
+    filter: drop-shadow(0 0 2px #00d8ff);
+  }
+  50% {
+    filter: drop-shadow(0 0 8px #00ff41);
+  }
+}
+
+/* Satellite dish signals */
+.dish-signal {
+  stroke-dasharray: 5 10;
+  animation: dishTransmit 2s ease-in-out infinite;
+}
+
+.dish-signal-1 { animation-delay: 0s; }
+.dish-signal-2 { animation-delay: 0.4s; }
+.dish-signal-3 { animation-delay: 0.8s; }
+
+@keyframes dishTransmit {
+  0% {
+    opacity: 0;
+    stroke-dashoffset: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    stroke-dashoffset: 50;
+  }
+}
+
+.satellite-dish {
+  animation: dishRotate 6s linear infinite;
+}
+
+@keyframes dishRotate {
+  0%, 100% {
+    transform: rotate(-10deg);
+  }
+  50% {
+    transform: rotate(10deg);
+  }
+}
+
+/* ==================== EAM Message Styles ==================== */
+
+/* EAM Message Cards */
+.eam-message-card {
+  @apply bg-spacex-darker border rounded-lg p-4 transition-all;
+}
+
+.eam-message-card.high-confidence {
+  @apply border-green-500/40 shadow-lg shadow-green-500/20;
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.eam-message-card.medium-confidence {
+  @apply border-yellow-500/40;
+}
+
+.eam-message-card.low-confidence {
+  @apply border-red-500/40;
+}
+
+.eam-message-card.recent {
+  @apply border-orange-500/60;
+  animation: border-pulse 1.5s ease-in-out infinite;
+}
+
+/* Message Type Badges */
+.eam-badge {
+  @apply px-3 py-1 rounded-full text-xs font-bold font-mono uppercase;
+}
+
+.eam-badge.type-eam {
+  @apply bg-orange-500/20 text-orange-300 border border-orange-400/50;
+}
+
+.eam-badge.type-skyking {
+  @apply bg-red-500/20 text-red-300 border border-red-400/50;
+  animation: skyking-alert 1s ease-in-out infinite;
+}
+
+/* Confidence Indicators */
+.confidence-bar {
+  @apply h-2 rounded-full overflow-hidden bg-gray-700;
+}
+
+.confidence-fill {
+  @apply h-full transition-all duration-500;
+}
+
+.confidence-fill.high {
+  @apply bg-gradient-to-r from-green-500 to-green-400;
+}
+
+.confidence-fill.medium {
+  @apply bg-gradient-to-r from-yellow-500 to-yellow-400;
+}
+
+.confidence-fill.low {
+  @apply bg-gradient-to-r from-red-500 to-red-400;
+}
+
+/* Message Body Display */
+.eam-message-body {
+  @apply font-mono text-lg tracking-wider bg-black/40 p-4 rounded border border-gray-700;
+  letter-spacing: 0.15em;
+}
+
+.eam-character-group {
+  @apply inline-block mr-4;
+}
+
+.eam-header {
+  @apply text-2xl font-bold text-orange-400 font-mono tracking-widest;
+}
+
+/* Animations */
+@keyframes pulse-glow {
+  0%, 100% { 
+    box-shadow: 0 0 10px rgba(34, 197, 94, 0.2); 
+  }
+  50% { 
+    box-shadow: 0 0 20px rgba(34, 197, 94, 0.4); 
+  }
+}
+
+@keyframes border-pulse {
+  0%, 100% { 
+    border-color: rgba(249, 115, 22, 0.4); 
+  }
+  50% { 
+    border-color: rgba(249, 115, 22, 0.8); 
+  }
+}
+
+@keyframes skyking-alert {
+  0%, 100% { 
+    opacity: 1; 
+  }
+  50% { 
+    opacity: 0.7; 
+  }
+}
+
+/* Repeat Count Badge */
+.repeat-badge {
+  @apply inline-flex items-center px-2 py-1 rounded bg-blue-500/20 text-blue-300 text-xs font-mono border border-blue-400/50;
+}
+
+/* ============================================================================
+   Broadcast Overlay Styles
+   ============================================================================ */
+
+/* Broadcast page container */
+.broadcast-container {
+  @apply fixed inset-0 overflow-hidden;
+  font-family: var(--font-jetbrains-mono);
+}
+
+.broadcast-transparent {
+  background: transparent !important;
+}
+
+.broadcast-header {
+  @apply fixed top-0 left-0 right-0 h-16 z-50;
+  background: linear-gradient(180deg, rgba(10, 10, 10, 0.95) 0%, rgba(10, 10, 10, 0.7) 100%);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(0, 216, 255, 0.3);
+}
+
+.broadcast-info-panel {
+  @apply fixed top-16 right-0 bottom-20 w-80 z-40;
+  background: rgba(10, 10, 10, 0.9);
+  backdrop-filter: blur(15px);
+  border-left: 1px solid rgba(0, 216, 255, 0.3);
+  transform: translateX(0);
+  transition: transform 0.3s ease-in-out;
+}
+
+.broadcast-info-panel.hidden {
+  transform: translateX(100%);
+}
+
+.broadcast-ticker {
+  @apply fixed bottom-0 left-0 right-0 h-20 z-50;
+  background: linear-gradient(0deg, rgba(10, 10, 10, 0.95) 0%, rgba(10, 10, 10, 0.7) 100%);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid rgba(0, 216, 255, 0.3);
+  overflow: hidden;
+}
+
+/* Ticker Animation - Smooth continuous scroll */
+.ticker-content {
+  display: inline-flex;
+  white-space: nowrap;
+  animation: ticker-scroll 90s linear infinite;
+  padding-left: 100%;
+  will-change: transform;
+}
+
+@keyframes ticker-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%); /* Only scroll half since we duplicate items */
+  }
+}
+
+.ticker-content:hover {
+  animation-play-state: paused;
+}
+
+.ticker-item {
+  @apply inline-block mx-8 text-sm font-mono;
+}
+
+.ticker-item.aircraft {
+  @apply text-cyan-400;
+}
+
+.ticker-item.eam {
+  @apply text-orange-400;
+}
+
+.ticker-item.emergency {
+  @apply text-red-400;
+  animation: ticker-pulse 2s ease-in-out infinite;
+}
+
+@keyframes ticker-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+/* Scene Transition Animations */
+.scene-enter {
+  opacity: 0;
+  transform: scale(0.95);
+}
+
+.scene-enter-active {
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 500ms ease-in-out, transform 500ms ease-in-out;
+}
+
+.scene-exit {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.scene-exit-active {
+  opacity: 0;
+  transform: scale(1.05);
+  transition: opacity 500ms ease-in-out, transform 500ms ease-in-out;
+}
+
+/* EAM Alert Styles */
+.eam-alert-overlay {
+  @apply fixed inset-0 z-50;
+  background: rgba(0, 0, 0, 0.95);
+  animation: eam-alert-enter 500ms ease-out;
+}
+
+@keyframes eam-alert-enter {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.eam-alert-border {
+  @apply absolute inset-0 pointer-events-none;
+  border: 4px solid #ff3232;
+  animation: eam-border-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes eam-border-pulse {
+  0%, 100% {
+    border-color: rgba(255, 50, 50, 0.8);
+    box-shadow: inset 0 0 20px rgba(255, 50, 50, 0.3);
+  }
+  50% {
+    border-color: rgba(255, 50, 50, 1);
+    box-shadow: inset 0 0 40px rgba(255, 50, 50, 0.5);
+  }
+}
+
+.eam-countdown {
+  @apply text-2xl font-bold font-mono;
+  animation: countdown-pulse 1s ease-in-out infinite;
+}
+
+@keyframes countdown-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+/* Narrative Text Styles */
+.narrative-text {
+  @apply text-lg font-mono leading-relaxed;
+  text-shadow: 0 0 10px rgba(0, 216, 255, 0.3);
+  animation: narrative-fade-in 1s ease-in;
+}
+
+@keyframes narrative-fade-in {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Live Indicator */
+.live-indicator {
+  @apply inline-flex items-center px-3 py-1 rounded-full;
+  background: rgba(255, 50, 50, 0.2);
+  border: 1px solid #ff3232;
+}
+
+.live-dot {
+  @apply w-2 h-2 rounded-full bg-red-500 mr-2;
+  animation: live-pulse 2s ease-in-out infinite;
+}
+
+@keyframes live-pulse {
+  0%, 100% {
+    opacity: 1;
+    box-shadow: 0 0 5px rgba(255, 50, 50, 0.8);
+  }
+  50% {
+    opacity: 0.5;
+    box-shadow: 0 0 10px rgba(255, 50, 50, 1);
+  }
+}
+
+/* Glitch Text Effect for EAM Alert */
+.glitch-text {
+  position: relative;
+  animation: glitch 3s infinite;
+}
+
+@keyframes glitch {
+  0%, 90%, 100% {
+    transform: translate(0);
+  }
+  92% {
+    transform: translate(-2px, 2px);
+  }
+  94% {
+    transform: translate(2px, -2px);
+  }
+  96% {
+    transform: translate(-2px, -2px);
+  }
+  98% {
+    transform: translate(2px, 2px);
+  }
+}

@@ -12,6 +12,9 @@ AIRWAVE is a full-stack real-time aviation communications monitoring system that
 - 📊 **Message Validation** - 23 aviation data schemas for standards compliance
 - 🗺️ **Interactive World Map** - Live aircraft tracking with Leaflet (NEW!)
 - 📍 **Position Tracking** - Parse and display aircraft positions globally
+- 🔮 **Trajectory Prediction** - AI-powered flight path forecasting with 5-15 minute horizon
+- ⚠️ **Conflict Detection** - Real-time aircraft separation monitoring and alerts
+- 📈 **Path Smoothing** - Curved flight path visualization with interpolation
 - 📈 **Analytics Dashboard** - Statistics and insights on message patterns
 - 🎨 **Mission Control UI** - SpaceX-themed dark interface with real-time updates
 - 🔄 **WebSocket Streaming** - Low-latency message delivery
@@ -24,6 +27,8 @@ AIRWAVE is a full-stack real-time aviation communications monitoring system that
 - **Schema Validation** - JSON Schema validation using aviation_data_model_v1.0
 - **WebSocket Server** - Real-time data broadcasting
 - **Message Processing** - Categorization, enrichment, and parsing
+- **Trajectory Predictor** - Kinematic prediction engine for future aircraft positions
+- **Conflict Detector** - Separation monitoring with configurable safety thresholds
 - **REST API** - Schema and reference data endpoints
 - **SQLite Database** - Fast indexed queries with full-text search
 - **Data Persistence** - Survives restarts, searchable history
@@ -34,6 +39,8 @@ AIRWAVE is a full-stack real-time aviation communications monitoring system that
 - **Message Feed** - Categorized ACARS messages with metadata
 - **Statistics** - Live metrics and analytics
 - **Flight Tracker** - Active flight monitoring
+- **Predicted Paths** - Dashed trajectory overlays on map with ETA markers
+- **Conflict Alerts** - Real-time warning panel for separation violations
 - **Charts** - Message type distribution visualization
 
 ### Aviation Data Model v1.0
@@ -243,6 +250,37 @@ NODE_ENV=production
 AIRFRAMES_API_KEY=your_key_here
 PORT=3000
 FRONTEND_PORT=8501
+```
+
+## Trajectory Prediction & Conflict Detection
+
+AirWave includes advanced ATC-inspired features:
+
+### Trajectory Prediction
+- Forecasts aircraft positions 5-15 minutes ahead using kinematic models
+- Displayed as dashed lines on map with ETA markers
+- Confidence scoring based on data quality
+- Toggle visibility in map controls
+
+### Conflict Detection
+- Monitors aircraft separation (5nm horizontal, 1000ft vertical)
+- Real-time alerts for potential conflicts
+- Severity levels: low, medium, high, critical
+- Conflict history and analytics
+
+### Configuration
+Adjust prediction settings via API:
+```bash
+POST /api/prediction/config
+{
+  "horizon_minutes": 10,
+  "enabled": true
+}
+```
+
+View active conflicts:
+```bash
+GET /api/conflicts
 ```
 
 ## Troubleshooting
